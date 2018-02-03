@@ -1,21 +1,59 @@
 group 'Domain_Test_Auto_Project'
 version '1.0-SNAPSHOT'
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.9'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
-}
-
 apply plugin: 'groovy'
 apply plugin: 'java'
 
 sourceCompatibility = 1.5
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
+
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.codehaus.groovy:groovy-all:2.4.3"
+
+    //  Browser tools - Sel
+    testCompile "org.seleniumhq.selenium:selenium-api:2.53.0"
+    compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.53.0'
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:2.32"
+
+    //  For BDd - Cuc
+    testCompile "info.cukes:cucumber-groovy:1.2.3"
+    testCompile "info.cukes:cucumber-java:1.2.3"
+    testCompile "info.cukes:gherkin:2.12.2"
+    compile group: 'info.cukes', name: 'cucumber-jvm', version: '1.2.3'
+    testCompile group: 'info.cukes', name: 'cucumber-junit', version: '1.2.2'
+
+    //  For Parallel
+    testCompile group: 'junit', name: 'junit', version: '4.4'
+    testCompile group: 'org.testng', name: 'testng', version: '6.10'
+    compile group: 'com.beust', name: 'jcommander', version: '1.7'
+
 }
+
+configurations {
+    println "inside configurations"
+    cucumberRuntime { extendsFrom testRuntime }
+}
+
+task cucumber {
+    //dependsOn testClasses
+    println "inside cucumber task"
+
+    doLast {
+        javaexec {
+            systemProperties += ["browser" : System.getProperty('browser')]
+//            System.setProperty("geb.env", System.getProperty('geb.env'))
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = [
+                    '--plugin', 'pretty',
+                    '--glue', 'steps',
+                    'src/test/java/features'
+            ]
+        }
+    }
+}
+

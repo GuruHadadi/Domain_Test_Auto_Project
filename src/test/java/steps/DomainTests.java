@@ -1,6 +1,5 @@
 package steps;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -52,6 +51,13 @@ public class DomainTests {
                 .pollingEvery(3, TimeUnit.SECONDS)
                 .ignoring(NoSuchElementException.class);
 
+        //
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {
+                afterAll();
+            }
+        }));
+
     }
 
     public void oneTimeSetup() throws MalformedURLException {
@@ -78,31 +84,53 @@ public class DomainTests {
     @cucumber.api.java.After
     public void cleanup() {
         //driver.close();
-        //driver.quit();
+    }
+
+    public void afterAll() {
+        try {
+            if (driver != null)
+                driver.quit();
+        }catch (Exception e){
+            //  TODO:
+        }
     }
 
     @Given("^I am on Domain home page$")
     public void iAmOnDomainHomePage() throws Throwable {
-
         domainHome = new DomainHomePage(driver);
-        //Assert.assertTrue(driver.getTitle().equals("Sports Betting Online & Horse Racing in Australia - William Hill"));
+        //Assert.assertTrue(driver.getTitle().contains("Real Estate | Properties for Sale, Rent and Share | Domain"));
     }
 
     @When("^I click on the tab (.*?)$")
     public void iClickOnTheTabTabname(String tabName) throws Throwable {
         Map<String, WebElement> elements = domainHome.getAllTabElements();
-        elements.get(tabName).click();
+        if(tabName.contains(" > ")){
+            elements.get(tabName.split(" > ")[0]).click();
+            elements.get(tabName.split(" > ")[1]).click();
+        }else {
+            elements.get(tabName).click();
+        }
+    }
+
+    @Then("^the target tab-page (.*?) and section title (.*?) and (.*?) is displayed successfully$")
+    public void theTargetTabPageTabNameAndSectionTitleSectionTitleIsDisplayedSuccessfully(String tabName, String sectionTitle, String pageTitle) throws Throwable {
+
+        if (tabName.equals("New Homes") | tabName.equals("Agents") | tabName.contains("News")){
+            Assert.assertTrue(domainHome.sectionHeading.getText().equals(sectionTitle));
+            Assert.assertTrue(driver.getTitle().contains(pageTitle));
+        }
+        if (tabName.equals("Rent") | tabName.equals("Buy") | tabName.equals("Sold")){
+            Assert.assertTrue(driver.getTitle().contains(pageTitle));
+            Assert.assertTrue(domainHome.topSelectedTab.getText().equals(tabName));
+            Assert.assertTrue(domainHome.formSelectedButton.getText().equals(tabName));
+            Assert.assertTrue(domainHome.sectionHeading.getText().equals(sectionTitle));
+        }
+        if(tabName.equals("Commercial")){
+            Assert.assertTrue(driver.getTitle().contains(pageTitle));
+            Assert.assertTrue(domainHome.sectionHeading.getText().equals(sectionTitle));
+            domainHome.domainLink.click();// come back to domain page
+        }
 
     }
 
-    @Then("^the target tab-page (.*?) and section title (.*?) is displayed successfully$")
-    public void theTargetTabPageTabNameAndSectionTitleSectionTitleIsDisplayedSuccessfully(String tabName, String sectionTitle) throws Throwable {
-        Assert.assertTrue(domainHome.sectionHeading.getText().equals(sectionTitle));
-    }
-
-    @And("^I close my browser$")
-    public void iCloseMyBrowser() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
 }

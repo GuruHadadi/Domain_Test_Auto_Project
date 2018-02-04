@@ -4,6 +4,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.How;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +19,13 @@ public class DomainHomePage extends PageObject{
     public WebElement element;
     public JavascriptExecutor js;
     public ElementsHelper eh;
+
+    @FindBy(linkText = "Domain")
+    public WebElement domainLink;
+
+    //  ----- Tabs -----
+    @FindBy(css = "ul[class^=desktop-nav] a[class$=is-selected]")
+    public WebElement topSelectedTab;
 
     @FindBy(linkText = "Buy")
     public WebElement buyLink;
@@ -35,13 +43,34 @@ public class DomainHomePage extends PageObject{
     public WebElement commercialLink;
 
     @FindBy(linkText = "Agents")
-    public WebElement agentslLink;
+    public WebElement agentsLink;
 
+    @FindBy(linkText = "News")
+    public WebElement newsLink;
+
+    @FindBy(linkText = "Advice")
+    public WebElement adviceLink;
+
+    @FindBy(linkText = "Living")
+    public WebElement livingLink;
+
+    //  ----- Section Headings -----
     @FindBy(css = "header[class^=domain-home] h1")
+    public WebElement sectionHeadingz;
+
+    @FindBy(css = "div h1")
     public WebElement sectionHeading;
 
     @FindBy(css = "div h1[class^=homepage-tag-line]")
     public WebElement sectionHeadingCommercial;
+
+    @FindBy(css = "div [class^=new-homes] h1")
+    public WebElement sectionHeadingNewHomes;
+
+
+    //  ----- Form Buttons -----
+    @FindBy(css = "form button[class$=is-selected]")
+    public WebElement formSelectedButton;
 
     public WebElement formBuyButton;
     public WebElement formRentButton;
@@ -55,20 +84,29 @@ public class DomainHomePage extends PageObject{
         retrieveElementsByText();
     }
 
-    public void retrieveElementsByText(){
-//        this.rentButton = eh.getElementByText("div[class^=search-box] button", "Rent");
-//        this.rentButton = eh.getElementByText("div[class^=search-box] button", "Rent");
-//        this.rentButton = eh.getElementByText("div[class^=search-box] button", "Rent");
-    }
-
     public Map<String, WebElement> getAllTabElements(){
         Map<String, WebElement> map = new HashMap<String, WebElement>();
         map.put("Rent", rentLink);
         map.put("Buy", buyLink);
         map.put("New Homes", newHomesLink);
         map.put("Sold", soldLink);
+        map.put("Commercial", commercialLink);
+        map.put("News", newsLink);
+        map.put("Agents", agentsLink);
+        map.put("Advice", adviceLink);
+        map.put("Living", livingLink);
 
         return map;
     }
+
+    //  This is a mechanism to identify elements by text using javascript
+    // not used but retaining just for reference.
+    public void retrieveElementsByText(){
+//        this.formRentButton = eh.getElementByText("div[class^=search-box] button", "Rent");
+//        this.formBuyButton = eh.getElementByText("div[class^=search-box] button", "Buy");
+//        this.formSoldButton = eh.getElementByText("div[class^=search-box] button", "Sold");
+//        this.formNewHomesButton = eh.getElementByText("div[class^=search-box] button", "New Homes");
+    }
+
 
 }
